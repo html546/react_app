@@ -24,14 +24,24 @@ class Counter extends Component {
         console.log('enter componentDidMount ' + this.props.caption);
     }
     onClickIncrementButton() {
-        this.setState({
+        /* this.setState({
             count: this.state.count + 1
-        })
+        }) */
+        this.updateCount(true);
     }
     onClickDecrementButton() {
-        this.setState({
+        /* this.setState({
             count: this.state.count - 1
+        }) */
+        this.updateCount(false);
+    }
+    updateCount(isIncrement) {
+        const previousValue = this.state.count;
+        const newValue = isIncrement ? previousValue + 1 : previousValue - 1;
+        this.setState({
+            count: newValue
         })
+        this.props.onUpdate(newValue, previousValue);
     }
     shouldComponentUpdate(nextProps, nextState) {
         return (nextProps.caption !== this.props.caption) || (nextState.count !== this.state.count);
@@ -51,11 +61,13 @@ class Counter extends Component {
 
 Counter.propTypes = {
     caption: PropTypes.string.isRequired,
-    initValue: PropTypes.number
+    initValue: PropTypes.number,
+    onUpdate: PropTypes.func
 }
 
 Counter.defaultProps = {
-    initValue: 0
+    initValue: 0,
+    onUpdate: f => f
 }
 
 
