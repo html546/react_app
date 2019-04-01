@@ -1,7 +1,20 @@
 import React, { Component } from 'react';
 import store from '../Store';
+import PropTypes from 'prop-types';
 
 class Summary extends Component {
+    render() {
+        return (
+            <div>Total Count: {this.props.sum}</div>
+        )
+    }
+}
+
+Summary.propTypes = {
+    sum: PropTypes.number.isRequired
+}
+
+class SummaryContainer extends Component {
     constructor(props) {
         super(props);
         this.onChange = this.onChange.bind(this);
@@ -30,11 +43,10 @@ class Summary extends Component {
         store.unsubscribe(this.onChange);
     }
     render() {
-        const sum = this.state.sum;
         return (
-            <div>Total Count: {sum}</div>
+            <Summary sum={this.state.sum} />
         )
     }
 }
 
-export default Summary;
+export default SummaryContainer;
