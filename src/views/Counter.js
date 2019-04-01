@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import * as Actions from '../Actions';
-import CounterStore from '../stores/CounterStore';
+import store from '../Store';
 
 const buttonStyle = {
     margin: '10px'
@@ -10,39 +10,43 @@ const buttonStyle = {
 class Counter extends Component {
     constructor(props) {
         super(props);
+        this.onIncrement = this.onIncrement.bind(this);
+        this.onDecrement = this.onDecrement.bind(this);
         this.onChange = this.onChange.bind(this);
-        this.onClickIncrementButton = this.onClickIncrementButton.bind(this);
-        this.onClickDecrementButton = this.onClickDecrementButton.bind(this);
-        this.state = {
-            count: CounterStore.getCounterValues()[props.caption]
+        this.getOwnState = this.getOwnState.bind(this);
+        this.state = this.getOwnState();
+    }
+    getOwnState() {
+        return {
+            value: store.getState()[this.props.caption]
         }
     }
-    shouldComponentUpdate(nextProps, nextState) {
-        return (nextProps.caption !== this.props.caption) || (nextState.count !== this.state.count);
+    onIncrement() {
+        store.dispatch(Actions.increment(this.props.caption));
     }
-    componentDidMount() {
-        CounterStore.addChangeListener(this.onChange);
-    }
-    componentWillUnmount() {
-        CounterStore.removeChangeListener(this.onChange);
+    onDecrement() {
+        store.dispatch(Actions.decrement(this.props.caption));
     }
     onChange() {
-        const newCount = CounterStore.getCounterValues()[this.props.caption];
-        this.setState({ count: newCount });
+        this.setState(this.getOwnState());
     }
-    onClickIncrementButton() {
-        Actions.increment(this.props.caption);
+    shouldComponentUpdate(nextProps, nextState) {
+        return (nextProps.caption !== this.props.caption) || (nextState.value !== this.state.value);
     }
-    onClickDecrementButton() {
-        Actions.decrement(this.props.caption);
+    componentDidMount() {
+        store.subscribe(this.onChange);
+    }
+    componentWillUnmount() {
+        store.unsubscribe(this.onChange);
     }
     render() {
+        const value = this.state.value
         const { caption } = this.props;
         return (
             <div>
-                <button style={buttonStyle} onClick={this.onClickIncrementButton}>+</button>
-                <button style={buttonStyle} onClick={this.onClickDecrementButton}>-</button>
-                <span>{caption} count: {this.state.count}</span>
+                <button style={buttonStyle} onClick={this.onIncrement}>+</button>
+                <button style={buttonStyle} onClick={this.onDecrement}>-</button>
+                <span>{caption} count: {value}</span>
             </div>
         )
     }
