@@ -1,52 +1,25 @@
-import React, { Component } from 'react';
-import store from '../Store';
+import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
-class Summary extends Component {
-    render() {
-        return (
-            <div>Total Count: {this.props.sum}</div>
-        )
-    }
+function Summary({ value }) {
+    return (
+        <div>Total Count:{value}</div>
+    )
 }
 
 Summary.propTypes = {
-    sum: PropTypes.number.isRequired
+    value: PropTypes.number.isRequired
 }
 
-class SummaryContainer extends Component {
-    constructor(props) {
-        super(props);
-        this.onChange = this.onChange.bind(this);
-        this.state = this.getOwnState();
-    }
-    onChange() {
-        this.setState(this.getOwnState())
-    }
-    getOwnState() {
-        const state = store.getState();
-        let sum = 0;
-        for (const key in state) {
-            if (state.hasOwnProperty(key)) {
-                sum += state[key];
-            }
+function mapStateToProps(state) {
+    let sum = 0;
+    for (const key in state) {
+        if (state.hasOwnProperty(key)) {
+            sum += state[key];
         }
-        return { sum: sum }
     }
-    shouldComponentUpdate(nextProps, nextState) {
-        return nextState.sum !== this.state.sum;
-    }
-    componentDidMount() {
-        store.subscribe(this.onChange);
-    }
-    componentWillUnmount() {
-        store.unsubscribe(this.onChange);
-    }
-    render() {
-        return (
-            <Summary sum={this.state.sum} />
-        )
-    }
+    return { value: sum };
 }
 
-export default SummaryContainer;
+export default connect(mapStateToProps)(Summary);
